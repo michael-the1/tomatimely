@@ -172,6 +172,14 @@ class PomodoroTimer extends React.Component {
             } else {
                 this.handleStartClick();
             }
+        } else if (e.key === "1") {
+            this.preparePomodoro();
+        } else if (e.key === "2") {
+            this.prepareShortBreak();
+        } else if (e.key === "3") {
+            this.prepareLongBreak();
+        } else if (e.key === "r") {
+            this.handleResetClick();
         }
     }
 
