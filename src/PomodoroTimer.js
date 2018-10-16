@@ -14,7 +14,7 @@ function ResetSettingsLogControls(props) {
     return (
         <div className="btn-group btn-group-lg" role="group">
             <button type="button" className="btn btn-danger" onClick={props.handleResetClick}>Reset</button>
-            <button type="button" className="btn btn-info" data-toggle="modal" data-target="#settings-modal">Settings</button>
+            <button type="button" className="btn btn-secondary" data-toggle="modal" data-target="#settings-modal">Settings</button>
             <button type="button" className="btn btn-info" data-toggle="modal" data-target="#log-modal">Logs</button>
         </div>
     );
