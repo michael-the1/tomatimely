@@ -90,7 +90,7 @@ function LogModal(props) {
                         <h3 className="modal-title" id="log-modal-label">Logs</h3>
                     </div>
                     <div className="modal-content">
-                        <p>Placeholder text</p>
+                        <p>Coming Soon™</p>
                     </div>
                 </div>
             </div>
