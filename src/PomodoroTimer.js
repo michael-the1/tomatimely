@@ -213,10 +213,12 @@ class PomodoroTimer extends React.Component {
         this.setState({
             timerID: null,
             time: this.state.durations.pomodoro,
+            currentIntervalType: 'pomodoro',
         });
     }
 
     preparePomodoro = () => {
+        clearInterval(this.state.timerID);
         this.setState({
             time: this.state.durations.pomodoro,
             currentIntervalType: 'pomodoro',
@@ -224,6 +226,7 @@ class PomodoroTimer extends React.Component {
     }
 
     prepareShortBreak = () => {
+        clearInterval(this.state.timerID);
         this.setState(prevState => ({
             time: this.state.durations.shortBreak,
             currentBreakInterval: prevState.currentBreakInterval + 1,
@@ -232,6 +235,7 @@ class PomodoroTimer extends React.Component {
     }
 
     prepareLongBreak = () => {
+        clearInterval(this.state.timerID);
         this.setState({
             time: this.state.durations.longBreak,
             currentBreakInterval: 0,
