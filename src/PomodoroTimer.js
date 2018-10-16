@@ -321,6 +321,21 @@ class PomodoroTimer extends React.Component {
                         />
                     </div>
                     <AboutModal />
+
+                    <div className="card text-left mx-auto my-4" id="keyboard-shortcuts-text">
+                        <div className="card-body">
+                            <h5 className="card-title">Keyboard shortcuts</h5>
+                            <p className="card-text">
+                                <ul>
+                                    <li>Spacebar: Start / Pause timer</li>
+                                    <li>1: Pomodoro</li>
+                                    <li>2: Short break</li>
+                                    <li>3: Long break</li>
+                                    <li>r: Reset timer</li>
+                                </ul>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         );

@@ -1,3 +1,12 @@
 #countdown-timer {
     font-size: 100px;
 }
+
+#keyboard-shortcuts-text {
+    width: 20rem;
+}
+@media only screen and (max-width: 768px) {
+    #keyboard-shortcuts-text {
+        visibility: hidden;
+    }
+}
