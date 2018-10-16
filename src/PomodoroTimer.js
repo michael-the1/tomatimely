@@ -105,6 +105,7 @@ function AboutModal(props) {
                 <div className="modal-content">
                     <div className="modal-header">
                         <h3 className="modal-title" id="about-modal-label">About</h3>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                     <div className="modal-body text-left">
                         <p>
