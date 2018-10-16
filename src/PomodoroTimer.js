@@ -132,6 +132,14 @@ function AboutText(props) {
     );
 }
 
+function NavBar(props) {
+    return (
+        <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <h1 className="navbar-brand">Tomatimely</h1>
+        </nav>
+    );
+}
+
 class PomodoroTimer extends React.Component {
     constructor(props) {
         super(props);
@@ -254,40 +262,44 @@ class PomodoroTimer extends React.Component {
 
     render() {
         return (
-            <div className="container text-center">
-                <TimerSelection
-                    preparePomodoro={this.preparePomodoro}
-                    prepareShortBreak={this.prepareShortBreak}
-                    prepareLongBreak={this.prepareLongBreak}
-                    currentIntervalType={this.state.currentIntervalType}
-                />
+            <div>
+                <NavBar />
+                <div className="container text-center">
 
-                <CountdownTimer time={this.state.time}/>
-                <div>
-                    <TimerControls
-                        handleStartClick={this.handleStartClick}
-                        handlePauseClick={this.handlePauseClick}
-                    />
-                </div>
-
-                <div className="my-1">
-                    <ResetSettingsLogControls
-                        handleResetClick={this.handleResetClick}
+                    <TimerSelection
+                        preparePomodoro={this.preparePomodoro}
+                        prepareShortBreak={this.prepareShortBreak}
+                        prepareLongBreak={this.prepareLongBreak}
+                        currentIntervalType={this.state.currentIntervalType}
                     />
 
-                    <SettingsModal
-                        durations={this.state.durations}
-                        handleTimeChange={this.handleTimeChange}
-                        handleContinuousModeChange={this.handleContinuousModeChange}
-                        continuousMode={this.state.continuousMode}
-                    />
+                    <CountdownTimer time={this.state.time}/>
+                    <div>
+                        <TimerControls
+                            handleStartClick={this.handleStartClick}
+                            handlePauseClick={this.handlePauseClick}
+                        />
+                    </div>
 
-                    <LogModal
-                        logs={this.props.logs}
-                    />
-                </div>
-                <div className="my-4">
-                    <AboutText />
+                    <div className="my-1">
+                        <ResetSettingsLogControls
+                            handleResetClick={this.handleResetClick}
+                        />
+
+                        <SettingsModal
+                            durations={this.state.durations}
+                            handleTimeChange={this.handleTimeChange}
+                            handleContinuousModeChange={this.handleContinuousModeChange}
+                            continuousMode={this.state.continuousMode}
+                        />
+
+                        <LogModal
+                            logs={this.props.logs}
+                        />
+                    </div>
+                    <div className="my-4">
+                        <AboutText />
+                    </div>
                 </div>
             </div>
         );
