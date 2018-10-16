@@ -149,6 +149,7 @@ class PomodoroTimer extends React.Component {
             currentBreakInterval: 0,
             currentIntervalType: 'pomodoro',
             continuousMode: true,
+            timerID: null,
         };
     }
 
@@ -171,29 +172,31 @@ class PomodoroTimer extends React.Component {
     }
 
     handleStartClick = () => {
-        var timerID = setInterval(() => {
-            this.setState(prevState => ({
-                time: prevState.time - 1,
-            }));
+        if (this.state.timerID === null) {
+            var timerID = setInterval(() => {
+                this.setState(prevState => ({
+                    time: prevState.time - 1,
+                }));
 
-            if (this.state.time === 0) {
-                clearInterval(this.state.timerID);
+                if (this.state.time === 0) {
+                    clearInterval(this.state.timerID);
 
-                if (this.state.currentIntervalType !== 'pomodoro') {
-                    this.preparePomodoro();
-                } else if (this.state.currentBreakInterval === this.props.breakInterval) {
-                    this.prepareLongBreak();
-                } else {
-                    this.prepareShortBreak();
+                    if (this.state.currentIntervalType !== 'pomodoro') {
+                        this.preparePomodoro();
+                    } else if (this.state.currentBreakInterval === this.props.breakInterval) {
+                        this.prepareLongBreak();
+                    } else {
+                        this.prepareShortBreak();
+                    }
+
+                    if (this.state.continuousMode) {
+                        this.handleStartClick();
+                    }
                 }
 
-                if (this.state.continuousMode) {
-                    this.handleStartClick();
-                }
-            }
-
-        }, 1000);
-        this.setState({timerID: timerID});
+            }, 1000);
+            this.setState({timerID: timerID});
+        }
     }
 
     handlePauseClick = () => {
