@@ -264,7 +264,7 @@ class PomodoroTimer extends React.Component {
         return (
             <div>
                 <NavBar />
-                <div className="container text-center">
+                <div className="container text-center my-2">
 
                     <TimerSelection
                         preparePomodoro={this.preparePomodoro}
