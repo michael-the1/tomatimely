@@ -1,5 +1,6 @@
 import React from 'react';
 import './PomodoroTimer.css';
+import bells from './audio/bells.wav'
 
 function TimerControls(props) {
     return (
@@ -105,7 +106,7 @@ function AboutModal(props) {
                 <div className="modal-content">
                     <div className="modal-header">
                         <h3 className="modal-title" id="about-modal-label">About</h3>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                     <div className="modal-body text-left">
                         <p>
@@ -114,15 +115,13 @@ function AboutModal(props) {
                         </p>
 
                         <h4>How does it work?</h4>
-                        <p>
-                            <ol>
-                                <li>Choose the task to perform</li>
-                                <li>Start the Pomodoro timer</li>
-                                <li>Work on the task until the timer rings</li>
-                                <li>Take a short break. Congratulations, you've completed a pomodoro!</li>
-                                <li>Every 4 pomodoros, take a longer break</li>
-                            </ol>
-                        </p>
+                        <ol>
+                            <li>Choose the task to perform</li>
+                            <li>Start the Pomodoro timer</li>
+                            <li>Work on the task until the timer rings</li>
+                            <li>Take a short break. Congratulations, you've completed a pomodoro!</li>
+                            <li>Every 4 pomodoros, take a longer break</li>
+                        </ol>
 
                         <h4>Why does it work?</h4>
                         <p>Distractions are all around us. Right when we're in the middle of some focused work or study, we might get interrupted by an instant message, an e-mail, or a colleague dropping by. The goal of the Pomodoro technique is to limit the impact of these distractions. Try to stay focused during the whole session and postpone your distractions until later. See an e-mail coming in? You can look at it after finishing your pomodoro. Does a colleague want to grab coffee? Ask if they can wait until your break starts.</p>
@@ -199,6 +198,7 @@ class PomodoroTimer extends React.Component {
                 }));
 
                 if (this.state.time === 0) {
+                    play_audio();
                     clearInterval(this.state.timerID);
 
                     if (this.state.currentIntervalType !== 'pomodoro') {
@@ -325,15 +325,13 @@ class PomodoroTimer extends React.Component {
                     <div className="card text-left mx-auto my-4" id="keyboard-shortcuts-text">
                         <div className="card-body">
                             <h5 className="card-title">Keyboard shortcuts</h5>
-                            <p className="card-text">
-                                <ul>
-                                    <li>Spacebar: Start / Pause timer</li>
-                                    <li>1: Pomodoro</li>
-                                    <li>2: Short break</li>
-                                    <li>3: Long break</li>
-                                    <li>r: Reset timer</li>
-                                </ul>
-                            </p>
+                            <ul>
+                                <li>Spacebar: Start / Pause timer</li>
+                                <li>1: Pomodoro</li>
+                                <li>2: Short break</li>
+                                <li>3: Long break</li>
+                                <li>r: Reset timer</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -347,6 +345,11 @@ function s_to_mmss(seconds) {
     var date = new Date(null);
     date.setSeconds(seconds);
     return date.toISOString().substr(14, 5);
+}
+
+function play_audio() {
+    var audio = new Audio(bells);
+    audio.play()
 }
 
 export default PomodoroTimer;
