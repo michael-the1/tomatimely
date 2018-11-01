@@ -1,141 +1,14 @@
 import React from 'react';
 import './PomodoroTimer.css';
-import bells from './audio/bells.wav'
-
-function TimerControls(props) {
-    return (
-        <div className="btn-group btn-group-lg" role="group">
-            <button type="button" className="btn btn-lg btn-primary" onClick={props.handleStartClick}>Start</button>
-            <button type="button" className="btn btn-lg btn-secondary" onClick={props.handlePauseClick}>Pause</button>
-        </div>
-    );
-}
-
-function ResetSettingsLogControls(props) {
-    return (
-        <div className="btn-group btn-group-lg" role="group">
-            <button type="button" className="btn btn-danger" onClick={props.handleResetClick}>Reset</button>
-            <button type="button" className="btn btn-secondary" data-toggle="modal" data-target="#settings-modal">Settings</button>
-            <button type="button" className="btn btn-info" data-toggle="modal" data-target="#log-modal">Logs</button>
-        </div>
-    );
-}
+import bells from './audio/bells.wav';
+import { SettingsModal } from './settings';
+import { LogModal } from './logging';
+import { AboutModal, KeyboardShortcutsInfo  } from './about';
+import { TimerControls, ResetSettingsLogControls, TimerSelection } from './controls';
+import { s_to_mmss } from './util'
 
 function CountdownTimer(props) {
     return <h1 id="countdown-timer">{s_to_mmss(props.time)}</h1>;
-}
-
-function TimerSelection(props) {
-    return (
-        <div className="btn-group btn-group-toggle" data-toggle="buttons">
-            <label className={"btn btn-outline-secondary " + (props.currentIntervalType === "pomodoro" ? "active" : "")} onClick={props.preparePomodoro}>
-                <input type="radio" name="options" id="option1" autoComplete="off"/> Pomodoro
-            </label>
-            <label className={"btn btn-outline-secondary " + (props.currentIntervalType === "short-break" ? "active" : "")} onClick={props.prepareShortBreak}>
-                <input type="radio" name="options" id="option2" autoComplete="off"/> Short break
-            </label>
-            <label className={"btn btn-outline-secondary " + (props.currentIntervalType === "long-break" ? "active" : "")} onClick={props.prepareLongBreak}>
-                <input type="radio" name="options" id="option3" autoComplete="off" /> Long break
-            </label>
-        </div>
-    );
-}
-
-function SettingsModal(props) {
-    return (
-        <div className="modal fade" id="settings-modal" tabIndex="-1" role="dialog" aria-hidden="true" aria-labelledby="settings-modal-label">
-            <div className="modal-dialog" role="document">
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <h3 className="modal-title" id="settings-modal-label">Settings</h3>
-                    </div>
-                    <div className="modal-body container">
-                        <form>
-                            <div className="form-row">
-                                <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" value="" id="autoresume-check" onChange={props.handleContinuousModeChange} defaultChecked="{props.continuousMode}" />
-                                    <label className="form-check-label" htmlFor="defaultCheck1">
-                                        Continuous mode: automatically start the next section
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group col">
-                                    <label htmlFor="settings-pomodoro">Pomodoro</label>
-                                    <input id="settings-pomodoro" name="pomodoro" className="form-control" type="number" min="1" max="60" value={props.durations.pomodoro / 60} onChange={(e) => props.handleTimeChange(e)}/>
-                                </div>
-                                <div className="form-group col">
-                                    <label htmlFor="settings-short-break">Short break</label>
-                                    <input id="settings-short-break" name="shortBreak" className="form-control" type="number" min="1" max="60" value={props.durations.shortBreak / 60} onChange={(e) => props.handleTimeChange(e)}/>
-                                </div>
-                                <div className="form-group col">
-                                    <label htmlFor="settings-long-break">Long break</label>
-                                    <input id="settings-long-break" name="longBreak" className="form-control" type="number" min="1" max="60" value={props.durations.longBreak / 60} onChange={(e) => props.handleTimeChange(e)}/>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function LogModal(props) {
-    return (
-        <div className="modal fade" id="log-modal" tabIndex="-1" role="dialog" aria-hidden="true" aria-labelledby="log-modal-label">
-            <div className="modal-dialog" role="document">
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <h3 className="modal-title" id="log-modal-label">Logs</h3>
-                    </div>
-                    <div className="modal-content">
-                        <p>Coming Soon™</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function AboutModal(props) {
-    return (
-        <div className="modal fade" id="about-modal" tabIndex="-1" role="dialog" aria-hidden="true" aria-labelledby="about-modal-label">
-            <div className="modal-dialog" role="document">
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <h3 className="modal-title" id="about-modal-label">About</h3>
-                        <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                    <div className="modal-body text-left">
-                        <p>
-                            The Pomodoro technique is a time management technique to work and study more productively.
-                            For more information, check out <a href="https://francescocirillo.com/pages/pomodoro-technique">this page</a>.
-                        </p>
-
-                        <h4>How does it work?</h4>
-                        <ol>
-                            <li>Choose the task to perform</li>
-                            <li>Start the Pomodoro timer</li>
-                            <li>Work on the task until the timer rings</li>
-                            <li>Take a short break. Congratulations, you've completed a pomodoro!</li>
-                            <li>Every 4 pomodoros, take a longer break</li>
-                        </ol>
-
-                        <h4>Why does it work?</h4>
-                        <p>Distractions are all around us. Right when we're in the middle of some focused work or study, we might get interrupted by an instant message, an e-mail, or a colleague dropping by. The goal of the Pomodoro technique is to limit the impact of these distractions. Try to stay focused during the whole session and postpone your distractions until later. See an e-mail coming in? You can look at it after finishing your pomodoro. Does a colleague want to grab coffee? Ask if they can wait until your break starts.</p>
-
-                        <h4>What's a pomodoro?</h4>
-                        <p>"Pomodoro" means "tomato" in Italian. The inventor of the Pomodoro technique, Francesco Cirillo, named the technique after the tomato-shaped timer from his university days.</p>
-
-                        <h4>About Tomatimely</h4>
-                        <p>Tomatimely is developed by <a href="http://www.michaelthe.com">Michael The</a> and the result of trying out countless Pomodoro timer apps and websites and feeling unsatisfied by all of them. They would all miss some feature the other would have. Tomatimely is made perfect for me — and maybe you'll find it useful as well.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
 }
 
 function NavBar(props) {
@@ -297,12 +170,10 @@ class PomodoroTimer extends React.Component {
                     />
 
                     <CountdownTimer time={this.state.time}/>
-                    <div>
                         <TimerControls
                             handleStartClick={this.handleStartClick}
                             handlePauseClick={this.handlePauseClick}
                         />
-                    </div>
 
                     <div className="my-1">
                         <ResetSettingsLogControls
@@ -320,32 +191,15 @@ class PomodoroTimer extends React.Component {
                             logs={this.props.logs}
                         />
                     </div>
-                    <AboutModal />
 
-                    <div className="card text-left mx-auto my-4" id="keyboard-shortcuts-text">
-                        <div className="card-body">
-                            <h5 className="card-title">Keyboard shortcuts</h5>
-                            <ul>
-                                <li>Spacebar: Start / Pause timer</li>
-                                <li>1: Pomodoro</li>
-                                <li>2: Short break</li>
-                                <li>3: Long break</li>
-                                <li>r: Reset timer</li>
-                            </ul>
-                        </div>
-                    </div>
+                    <AboutModal />
+                    <KeyboardShortcutsInfo />
                 </div>
             </div>
         );
     }
 }
 
-function s_to_mmss(seconds) {
-    // Given a time in seconds, return its mm:ss representation
-    var date = new Date(null);
-    date.setSeconds(seconds);
-    return date.toISOString().substr(14, 5);
-}
 
 function play_audio() {
     var audio = new Audio(bells);
