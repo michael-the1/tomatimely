@@ -1,6 +1,8 @@
 import React from 'react';
 import './PomodoroTimer.css';
 import bells from './audio/bells.wav';
+import bells2 from './audio/bells2.mp3';
+import dingdong from './audio/dingdong.wav'
 import { SettingsModal } from './settings';
 import { LogModal } from './logging';
 import { AboutModal, KeyboardShortcutsInfo  } from './about';
@@ -20,6 +22,8 @@ function NavBar(props) {
     );
 }
 
+var sounds = {'bells': bells, 'bells2': bells2, 'dingdong': dingdong};
+
 class PomodoroTimer extends React.Component {
     constructor(props) {
         super(props);
@@ -34,6 +38,7 @@ class PomodoroTimer extends React.Component {
             currentIntervalType: 'pomodoro',
             continuousMode: true,
             timerID: null,
+            enableAudio: false,
         };
     }
 
@@ -71,7 +76,7 @@ class PomodoroTimer extends React.Component {
                 }));
 
                 if (this.state.time === 0) {
-                    play_audio();
+                    this.playAudio();
                     clearInterval(this.state.timerID);
 
                     if (this.state.currentIntervalType !== 'pomodoro') {
@@ -156,6 +161,19 @@ class PomodoroTimer extends React.Component {
         }));
     }
 
+    handleAudioChange = (e) => {
+        this.setState(prevState => ({
+            enableAudio: !prevState.enableAudio,
+        }));
+    }
+
+    playAudio = (e) => {
+        if ( this.state.enableAudio ) {
+            var audio = new Audio(sounds[this.state.sound]);
+            audio.play()
+        }
+    }
+
     render() {
         return (
             <div>
@@ -185,6 +203,8 @@ class PomodoroTimer extends React.Component {
                             handleTimeChange={this.handleTimeChange}
                             handleContinuousModeChange={this.handleContinuousModeChange}
                             continuousMode={this.state.continuousMode}
+                            enableAudio={this.state.enableAudio}
+                            handleAudioChange={this.handleAudioChange}
                         />
 
                         <LogModal
@@ -201,9 +221,5 @@ class PomodoroTimer extends React.Component {
 }
 
 
-function play_audio() {
-    var audio = new Audio(bells);
-    audio.play()
-}
 
 export default PomodoroTimer;

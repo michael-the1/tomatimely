@@ -12,8 +12,17 @@ function SettingsModal(props) {
                         <form>
                             <div className="form-row">
                                 <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" value="" id="autoresume-check" onChange={props.handleContinuousModeChange} defaultChecked="{props.continuousMode}" />
-                                    <label className="form-check-label" htmlFor="defaultCheck1">
+                                    <input className="form-check-input" type="checkbox" value="" id="enableAudio-check" onChange={props.handleAudioChange} defaultChecked={props.enableAudio} />
+                                    <label className="form-check-label" htmlFor="enableAudio-check">
+                                        Enable audio
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-check">
+                                    <input className="form-check-input" type="checkbox" value="" id="continuousMode-check" onChange={props.handleContinuousModeChange} defaultChecked={props.continuousMode} />
+                                    <label className="form-check-label" htmlFor="continuousMode-check">
                                         Continuous mode: automatically start the next section
                                     </label>
                                 </div>
