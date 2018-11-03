@@ -46,9 +46,9 @@ function KeyboardShortcutsInfo(props) {
                 <h5 className="card-title">Keyboard shortcuts</h5>
                 <ul>
                     <li>Spacebar: Start / Pause timer</li>
-                    <li>1: Pomodoro</li>
-                    <li>2: Short break</li>
-                    <li>3: Long break</li>
+                    <li>q: Pomodoro</li>
+                    <li>w: Short break</li>
+                    <li>e: Long break</li>
                     <li>r: Reset timer</li>
                 </ul>
             </div>
