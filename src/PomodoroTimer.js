@@ -38,7 +38,7 @@ class PomodoroTimer extends React.Component {
             currentIntervalType: 'pomodoro',
             continuousMode: true,
             timerID: null,
-            enableAudio: false,
+            enableAudio: true,
         };
     }
 
