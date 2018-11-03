@@ -1,6 +1,12 @@
 import React from 'react';
 
 function LogModal(props) {
+    const logItems = props.logs.map((logItem) =>
+        <li key={ logItem }>
+            { logItem }
+        </li>
+    );
+
     return (
         <div className="modal fade" id="log-modal" tabIndex="-1" role="dialog" aria-hidden="true" aria-labelledby="log-modal-label">
             <div className="modal-dialog" role="document">
@@ -9,7 +15,7 @@ function LogModal(props) {
                         <h3 className="modal-title" id="log-modal-label">Logs</h3>
                     </div>
                     <div className="modal-content">
-                        <p>Coming Soon™</p>
+                        <ul>{ logItems }</ul>
                     </div>
                 </div>
             </div>

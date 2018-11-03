@@ -9,6 +9,12 @@ import { AboutModal, KeyboardShortcutsInfo  } from './about';
 import { TimerControls, ResetSettingsLogControls, TimerSelection } from './controls';
 import { s_to_mmss } from './util'
 
+function getCurrentDatetime() {
+    // Get current Datetime, e.g., "Sat Nov 03 2018 12:18:48"
+    var d = new Date();
+    return d.toString().slice(0, 24);
+}
+
 function CountdownTimer(props) {
     return <h1 id="countdown-timer">{s_to_mmss(props.time)}</h1>;
 }
@@ -39,6 +45,7 @@ class PomodoroTimer extends React.Component {
             continuousMode: true,
             timerID: null,
             enableAudio: true,
+            logs: [],
         };
     }
 
@@ -94,12 +101,20 @@ class PomodoroTimer extends React.Component {
 
             }, 1000);
             this.setState({timerID: timerID});
+
+            this.setState(prevState => ({
+                logs: [...prevState.logs, `Started a ${this.state.currentIntervalType} timer at ${getCurrentDatetime()}`],
+            }));
         }
     }
 
     handlePauseClick = () => {
         clearInterval(this.state.timerID);
         this.setState({timerID: null});
+
+        this.setState(prevState => ({
+            logs: [...prevState.logs, `Paused a ${this.state.currentIntervalType} timer at ${getCurrentDatetime()}`],
+        }));
     }
 
     handleResetClick = () => {
@@ -109,10 +124,20 @@ class PomodoroTimer extends React.Component {
             time: this.state.durations.pomodoro,
             currentIntervalType: 'pomodoro',
         });
+
+        this.setState(prevState => ({
+            logs: [...prevState.logs, `Reset at ${getCurrentDatetime()}`],
+        }));
     }
 
     preparePomodoro = () => {
         clearInterval(this.state.timerID);
+        if (this.state.timerID) {
+            this.setState(prevState => ({
+                logs: [...prevState.logs, `Stopped ${this.state.currentIntervalType} timer at ${getCurrentDatetime()}`],
+            }));
+        }
+
         this.setState({
             timerID: null,
             time: this.state.durations.pomodoro,
@@ -122,6 +147,11 @@ class PomodoroTimer extends React.Component {
 
     prepareShortBreak = () => {
         clearInterval(this.state.timerID);
+        if (this.state.timerID) {
+            this.setState(prevState => ({
+                logs: [...prevState.logs, `Stopped ${this.state.currentIntervalType} timer at ${getCurrentDatetime()}`],
+            }));
+        }
         this.setState(prevState => ({
             timerID: null,
             time: this.state.durations.shortBreak,
@@ -132,6 +162,11 @@ class PomodoroTimer extends React.Component {
 
     prepareLongBreak = () => {
         clearInterval(this.state.timerID);
+        if (this.state.timerID) {
+            this.setState(prevState => ({
+                logs: [...prevState.logs, `Stopped ${this.state.currentIntervalType} timer at ${getCurrentDatetime()}`],
+            }));
+        }
         this.setState({
             timerID: null,
             time: this.state.durations.longBreak,
@@ -208,7 +243,7 @@ class PomodoroTimer extends React.Component {
                         />
 
                         <LogModal
-                            logs={this.props.logs}
+                            logs={this.state.logs}
                         />
                     </div>
 
