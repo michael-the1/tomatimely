@@ -1,8 +1,6 @@
 import React from 'react';
 import './PomodoroTimer.css';
-import bells from './audio/bells.wav';
-import bells2 from './audio/bells2.mp3';
-import dingdong from './audio/dingdong.wav'
+import sounds from './sounds'
 import { SettingsModal } from './settings';
 import { LogModal } from './logging';
 import { AboutModal, KeyboardShortcutsInfo  } from './about';
@@ -27,8 +25,6 @@ function NavBar(props) {
         </nav>
     );
 }
-
-var sounds = {'bells': bells, 'bells2': bells2, 'dingdong': dingdong};
 
 class PomodoroTimer extends React.Component {
     constructor(props) {
