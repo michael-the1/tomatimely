@@ -16,19 +16,19 @@ function TimerSelection(props) {
     );
 }
 
-function TimerControls(props) {
+function TimerControls({startTimer, pauseTimer}) {
     return (
         <div className="btn-group btn-group-lg" role="group">
-            <button type="button" className="btn btn-lg btn-primary" onClick={props.handleStartClick}>Start</button>
-            <button type="button" className="btn btn-lg btn-secondary" onClick={props.handlePauseClick}>Pause</button>
+            <button type="button" className="btn btn-lg btn-primary" onClick={startTimer}>Start</button>
+            <button type="button" className="btn btn-lg btn-secondary" onClick={pauseTimer}>Pause</button>
         </div>
     );
 }
 
-function ResetSettingsLogControls(props) {
+function ResetSettingsLogControls({ resetTimer }) {
     return (
         <div className="btn-group btn-group-lg" role="group">
-            <button type="button" className="btn btn-danger" onClick={props.handleResetClick}>Reset</button>
+            <button type="button" className="btn btn-danger" onClick={resetTimer}>Reset</button>
             <button type="button" className="btn btn-secondary" data-toggle="modal" data-target="#settings-modal">Settings</button>
             <button type="button" className="btn btn-info" data-toggle="modal" data-target="#log-modal">Logs</button>
         </div>

@@ -1,11 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './PomodoroTimer.css';
-import sounds from './sounds'
 import { SettingsModal } from './settings';
 import { LogModal } from './logging';
 import { AboutModal, KeyboardShortcutsInfo  } from './about';
 import { TimerControls, ResetSettingsLogControls, TimerSelection } from './controls';
 import { s_to_mmss } from './util'
+
+
+const INTERVAL_TYPES = Object.freeze({
+    POMODORO: 1,
+    SHORT_BREAK: 2,
+    LONG_BREAK: 3
+});
+
+const DEFAULT_DURATIONS = Object.freeze({
+    POMODORO: 25 * 60,
+    SHORT_BREAK: 5 * 60,
+    LONG_BREAK: 25 * 60
+});
 
 function getCurrentDatetime() {
     // Get current Datetime, e.g., "Sat Nov 03 2018 12:18:48"
@@ -13,8 +25,8 @@ function getCurrentDatetime() {
     return d.toString().slice(0, 24);
 }
 
-function CountdownTimer(props) {
-    return <h1 id="countdown-timer">{s_to_mmss(props.time)}</h1>;
+function CountdownTimer({ time }) {
+    return <h1 id="countdown-timer">{s_to_mmss(time)}</h1>;
 }
 
 function NavBar(props) {
@@ -26,231 +38,156 @@ function NavBar(props) {
     );
 }
 
-class PomodoroTimer extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            durations: {
-                pomodoro: 25 * 60,
-                shortBreak: 5 * 60,
-                longBreak: 25 * 60,
-            },
-            time: 25 * 60,
-            currentBreakInterval: 0,
-            currentIntervalType: 'pomodoro',
-            continuousMode: true,
-            timerID: null,
-            enableAudio: true,
-            logs: [],
-        };
-    }
+function PomodoroTimer(props) {
+    const [durations, setDurations] = useState(DEFAULT_DURATIONS)
+    const [time, setTime] = useState(25 * 60)
+    const [currentBreakInterval, setCurrentBreakInterval] = useState(0)
+    const [currentIntervalType, setCurrentIntervalType] = useState(INTERVAL_TYPES.POMODORO)
+    const [continuousMode, setContinuousMode] = useState(true)
+    const [logs, setLogs] = useState([])
+    const [isActive, setIsActive] = useState(false);
+    const timerID = useRef(null);
 
-    componentDidMount() {
-        document.addEventListener("keypress", this.handleKeyPress);
-    }
-
-    componentWillUnmount() {
-        document.removeEventListener("keypress", this.handleKeyPress);
-    }
-
-    handleKeyPress = (e) => {
-        if (e.key === " ") {
-            if (this.state.timerID) {
-                this.handlePauseClick();
-            } else {
-                this.handleStartClick();
-            }
-        } else if (e.key === "q") {
-            this.preparePomodoro();
-        } else if (e.key === "w") {
-            this.prepareShortBreak();
-        } else if (e.key === "e") {
-            this.prepareLongBreak();
-        } else if (e.key === "r") {
-            this.handleResetClick();
-        }
-    }
-
-    handleStartClick = () => {
-        if (this.state.timerID === null) {
-            var timerID = setInterval(() => {
-                this.setState(prevState => ({
-                    time: prevState.time - 1,
-                }));
-
-                if (this.state.time === 0) {
-                    this.playAudio();
-                    clearInterval(this.state.timerID);
-
-                    if (this.state.currentIntervalType !== 'pomodoro') {
-                        this.preparePomodoro();
-                    } else if (this.state.currentBreakInterval === this.props.breakInterval) {
-                        this.prepareLongBreak();
+    useEffect(() => {
+        if (isActive && timerID.current === null) {
+            let newTimerID = setInterval(() => {
+                setTime((prevTime) => prevTime - 1);
+                if (time === 0) {
+                    clearInterval(timerID.current);
+                    if (currentIntervalType !== INTERVAL_TYPES.POMODORO) {
+                        preparePomodoro();
+                    } else if (currentBreakInterval === props.breakInterval) {
+                        prepareLongBreak();
                     } else {
-                        this.prepareShortBreak();
+                        prepareShortBreak();
                     }
 
-                    if (this.state.continuousMode) {
-                        this.handleStartClick();
+                    if (continuousMode) {
+                        startTimer();
                     }
                 }
 
             }, 1000);
-            this.setState({timerID: timerID});
-
-            this.setState(prevState => ({
-                logs: [...prevState.logs, `Started a ${this.state.currentIntervalType} timer at ${getCurrentDatetime()}`],
-            }));
+            timerID.current = newTimerID;
+        } else {
+            clearInterval(timerID.current)
+            timerID.current = null;
         }
+    }, [isActive])
+
+    const startTimer = () => {
+        setIsActive(true);
+        setLogs([...logs, `Started a ${currentIntervalType} timer at ${getCurrentDatetime()}`])
     }
 
-    handlePauseClick = () => {
-        clearInterval(this.state.timerID);
-        this.setState({timerID: null});
-
-        this.setState(prevState => ({
-            logs: [...prevState.logs, `Paused a ${this.state.currentIntervalType} timer at ${getCurrentDatetime()}`],
-        }));
+    const pauseTimer = () => {
+        setIsActive(false)
+        setLogs([...logs, `Paused a ${currentIntervalType} timer at ${getCurrentDatetime()}`])
     }
 
-    handleResetClick = () => {
-        clearInterval(this.state.timerID);
-        this.setState({
-            timerID: null,
-            time: this.state.durations.pomodoro,
-            currentIntervalType: 'pomodoro',
-        });
-
-        this.setState(prevState => ({
-            logs: [...prevState.logs, `Reset at ${getCurrentDatetime()}`],
-        }));
+    const resetTimer = () => {
+        setIsActive(false)
+        setTime(durations.POMODORO)
+        setCurrentIntervalType(INTERVAL_TYPES.POMODORO)
+        setLogs([...logs, `Reset at ${getCurrentDatetime()}`])
     }
 
-    preparePomodoro = () => {
-        clearInterval(this.state.timerID);
-        if (this.state.timerID) {
-            this.setState(prevState => ({
-                logs: [...prevState.logs, `Stopped ${this.state.currentIntervalType} timer at ${getCurrentDatetime()}`],
-            }));
+    const preparePomodoro = () => {
+        if (isActive) {
+        setLogs([...logs, `Stopped ${currentIntervalType} timer at ${getCurrentDatetime()}`])
         }
-
-        this.setState({
-            timerID: null,
-            time: this.state.durations.pomodoro,
-            currentIntervalType: 'pomodoro',
-        })
+        setIsActive(false)
+        setTime(durations.POMODORO)
+        setCurrentIntervalType(INTERVAL_TYPES.POMODORO)
     }
 
-    prepareShortBreak = () => {
-        clearInterval(this.state.timerID);
-        if (this.state.timerID) {
-            this.setState(prevState => ({
-                logs: [...prevState.logs, `Stopped ${this.state.currentIntervalType} timer at ${getCurrentDatetime()}`],
-            }));
+    const prepareShortBreak = () => {
+        if (isActive) {
+            setLogs([...logs, `Stopped ${currentIntervalType} timer at ${getCurrentDatetime()}`])
         }
-        this.setState(prevState => ({
-            timerID: null,
-            time: this.state.durations.shortBreak,
-            currentBreakInterval: prevState.currentBreakInterval + 1,
-            currentIntervalType: 'short-break',
-        }));
+        setIsActive(false)
+        setTime(durations.SHORT_BREAK)
+        setCurrentIntervalType(INTERVAL_TYPES.SHORT_BREAK)
+        setCurrentBreakInterval(currentBreakInterval + 1)
     }
 
-    prepareLongBreak = () => {
-        clearInterval(this.state.timerID);
-        if (this.state.timerID) {
-            this.setState(prevState => ({
-                logs: [...prevState.logs, `Stopped ${this.state.currentIntervalType} timer at ${getCurrentDatetime()}`],
-            }));
+    const prepareLongBreak = () => {
+        if (isActive) {
+            setLogs([...logs, `Stopped ${currentIntervalType} timer at ${getCurrentDatetime()}`])
         }
-        this.setState({
-            timerID: null,
-            time: this.state.durations.longBreak,
-            currentBreakInterval: 0,
-            currentIntervalType: 'long-break',
-        });
+        setIsActive(false)
+        setTime(durations.LONG_BREAK)
+        setCurrentIntervalType(INTERVAL_TYPES.LONG_BREAK)
+        setCurrentBreakInterval(0)
     }
 
-    handleTimeChange = (e) => {
-        var durations = this.state.durations;
-        const name = e.target.name;
-
-        if (name === 'pomodoro') {
-            durations.pomodoro = e.target.value * 60;
-        } else if (name === 'shortBreak') {
-            durations.shortBreak = e.target.value * 60;
-        } else if (name === 'longBreak') {
-            durations.longBreak = e.target.value * 60;
+    useEffect(() => {
+        function handleKeyPress(e) {
+            if (e.key === " ") {
+                if (isActive) {
+                    pauseTimer();
+                } else {
+                    startTimer();
+                }
+            } else if (e.key === "q") {
+                preparePomodoro();
+            } else if (e.key === "w") {
+                prepareShortBreak();
+            } else if (e.key === "e") {
+                prepareLongBreak();
+            } else if (e.key === "r") {
+                resetTimer();
+            }
         }
 
-        this.setState({durations: durations});
-    }
-
-    handleContinuousModeChange = (e) => {
-        this.setState(prevState => ({
-            continuousMode: !prevState.continuousMode,
-        }));
-    }
-
-    handleAudioChange = (e) => {
-        this.setState(prevState => ({
-            enableAudio: !prevState.enableAudio,
-        }));
-    }
-
-    playAudio = (e) => {
-        if ( this.state.enableAudio ) {
-            var audio = new Audio(sounds[this.state.sound]);
-            audio.play()
+        document.addEventListener("keypress", handleKeyPress);
+        return () => {
+            document.removeEventListener("keypress", handleKeyPress);
         }
-    }
+    });
 
-    render() {
-        return (
-            <div>
-                <NavBar />
-                <div className="container text-center my-2">
+    return (
+        <>
+            <NavBar />
+            <div className="container text-center my-2">
 
-                    <TimerSelection
-                        preparePomodoro={this.preparePomodoro}
-                        prepareShortBreak={this.prepareShortBreak}
-                        prepareLongBreak={this.prepareLongBreak}
-                        currentIntervalType={this.state.currentIntervalType}
+                <TimerSelection
+                    preparePomodoro={preparePomodoro}
+                    prepareShortBreak={prepareShortBreak}
+                    prepareLongBreak={prepareLongBreak}
+                    currentIntervalType={currentIntervalType}
+                />
+
+                <CountdownTimer time={time}/>
+
+                <TimerControls
+                    startTimer={startTimer}
+                    pauseTimer={pauseTimer}
+                />
+
+                <div className="my-1">
+                    <ResetSettingsLogControls
+                        resetTimer={resetTimer}
                     />
 
-                    <CountdownTimer time={this.state.time}/>
-                        <TimerControls
-                            handleStartClick={this.handleStartClick}
-                            handlePauseClick={this.handlePauseClick}
-                        />
+                    <SettingsModal
+                        durations={durations}
+                        setDurations={setDurations}
+                        continuousMode={continuousMode}
+                        setContinuousMode={setContinuousMode}
+                    />
 
-                    <div className="my-1">
-                        <ResetSettingsLogControls
-                            handleResetClick={this.handleResetClick}
-                        />
-
-                        <SettingsModal
-                            durations={this.state.durations}
-                            handleTimeChange={this.handleTimeChange}
-                            handleContinuousModeChange={this.handleContinuousModeChange}
-                            continuousMode={this.state.continuousMode}
-                            enableAudio={this.state.enableAudio}
-                            handleAudioChange={this.handleAudioChange}
-                        />
-
-                        <LogModal
-                            logs={this.state.logs}
-                        />
-                    </div>
-
-                    <AboutModal />
-                    <KeyboardShortcutsInfo />
+                    <LogModal
+                        logs={logs}
+                    />
                 </div>
+
+                <AboutModal />
+                <KeyboardShortcutsInfo />
             </div>
-        );
-    }
+        </>
+    );
+
 }
-
-
 
 export default PomodoroTimer;

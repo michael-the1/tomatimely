@@ -1,7 +1,7 @@
 import React from 'react';
 
-function LogModal(props) {
-    const logItems = props.logs.map((logItem) =>
+function LogModal({ logs }) {
+    const logItems = logs.map((logItem) =>
         <li key={ logItem }>
             { logItem }
         </li>
