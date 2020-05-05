@@ -40,7 +40,7 @@ function useTimer(timerDuration, continuousMode) {
                 setTime((prevTime) => prevTime - 1);
                 if (time === 0) {
                     clearInterval(timerID);
-
+                    setIsActive(false);
                     if (continuousMode) {
                         startTimer();
                     }
@@ -61,9 +61,9 @@ function useTimer(timerDuration, continuousMode) {
         setIsActive(false)
     }
 
-    const resetTimer = () => {
+    const resetTimer = (newTimerDuration) => {
         setIsActive(false)
-        setTime(timerDuration)
+        setTime(newTimerDuration)
     }
 
     return [time, setTime, isActive, startTimer, pauseTimer, resetTimer]
@@ -76,6 +76,7 @@ function PomodoroTimer(props) {
     const [durations, setDurations] = useState(DEFAULT_DURATIONS)
     const [currentBreakInterval, setCurrentBreakInterval] = useState(0)
     const [currentIntervalType, setCurrentIntervalType] = useState(INTERVAL_TYPES.POMODORO)
+    const [maxBreakInterval, setMaxBreakInterval] = useState(4)
 
     const [logs, setLogs] = useState([])
 
@@ -83,30 +84,39 @@ function PomodoroTimer(props) {
         if (isActive) {
             setLogs([...logs, `Stopped ${currentIntervalType} timer at ${getCurrentDatetime()}`])
         }
-        setTime(durations.POMODORO)
+        resetTimer(durations.POMODORO);
         setCurrentIntervalType(INTERVAL_TYPES.POMODORO)
-        resetTimer();
     }
 
     const prepareShortBreak = () => {
         if (isActive) {
             setLogs([...logs, `Stopped ${currentIntervalType} timer at ${getCurrentDatetime()}`])
         }
-        setTime(durations.SHORT_BREAK)
+        resetTimer(durations.SHORT_BREAK);
         setCurrentIntervalType(INTERVAL_TYPES.SHORT_BREAK)
         setCurrentBreakInterval(currentBreakInterval + 1)
-        resetTimer();
     }
 
     const prepareLongBreak = () => {
         if (isActive) {
             setLogs([...logs, `Stopped ${currentIntervalType} timer at ${getCurrentDatetime()}`])
         }
-        setTime(durations.LONG_BREAK)
+        resetTimer(durations.LONG_BREAK);
         setCurrentIntervalType(INTERVAL_TYPES.LONG_BREAK)
         setCurrentBreakInterval(0)
-        resetTimer();
     }
+
+    useEffect(() => {
+        if (time === 0) {
+            if (currentIntervalType !== INTERVAL_TYPES.POMODORO) {
+                preparePomodoro();
+            } else if (currentBreakInterval === maxBreakInterval) {
+                prepareLongBreak();
+            } else {
+                prepareShortBreak();
+            }
+        }
+    }, [time]);
 
     useEffect(() => {
         function handleKeyPress(e) {
