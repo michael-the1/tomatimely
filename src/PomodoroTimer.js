@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './PomodoroTimer.css';
+import { DEFAULT_DURATIONS, INTERVAL_TYPES } from './constants'
 import { SettingsModal } from './settings';
 import { LogModal } from './logging';
 import { AboutModal, KeyboardShortcutsInfo  } from './about';
@@ -7,17 +8,6 @@ import { TimerControls, ResetSettingsLogControls, TimerSelection } from './contr
 import { s_to_mmss } from './util'
 
 
-const INTERVAL_TYPES = Object.freeze({
-    POMODORO: 1,
-    SHORT_BREAK: 2,
-    LONG_BREAK: 3
-});
-
-const DEFAULT_DURATIONS = Object.freeze({
-    POMODORO: 25 * 60,
-    SHORT_BREAK: 5 * 60,
-    LONG_BREAK: 25 * 60
-});
 
 function getCurrentDatetime() {
     // Get current Datetime, e.g., "Sat Nov 03 2018 12:18:48"
@@ -38,87 +28,84 @@ function NavBar(props) {
     );
 }
 
-function PomodoroTimer(props) {
-    const [durations, setDurations] = useState(DEFAULT_DURATIONS)
-    const [time, setTime] = useState(25 * 60)
-    const [currentBreakInterval, setCurrentBreakInterval] = useState(0)
-    const [currentIntervalType, setCurrentIntervalType] = useState(INTERVAL_TYPES.POMODORO)
-    const [continuousMode, setContinuousMode] = useState(true)
-    const [logs, setLogs] = useState([])
+
+function useTimer(timerDuration, continuousMode) {
+    const [time, setTime] = useState(timerDuration)
     const [isActive, setIsActive] = useState(false);
-    const timerID = useRef(null);
+    const [timerID, setTimerID] = useState(null);
 
     useEffect(() => {
-        if (isActive && timerID.current === null) {
+        if (isActive && timerID === null) {
             let newTimerID = setInterval(() => {
                 setTime((prevTime) => prevTime - 1);
                 if (time === 0) {
-                    clearInterval(timerID.current);
-                    if (currentIntervalType !== INTERVAL_TYPES.POMODORO) {
-                        preparePomodoro();
-                    } else if (currentBreakInterval === props.breakInterval) {
-                        prepareLongBreak();
-                    } else {
-                        prepareShortBreak();
-                    }
+                    clearInterval(timerID);
 
                     if (continuousMode) {
                         startTimer();
                     }
                 }
-
             }, 1000);
-            timerID.current = newTimerID;
+            setTimerID(newTimerID);
         } else {
-            clearInterval(timerID.current)
-            timerID.current = null;
+            clearInterval(timerID)
+            setTimerID(null);
         }
-    }, [isActive])
+    }, [isActive]);
 
     const startTimer = () => {
         setIsActive(true);
-        setLogs([...logs, `Started a ${currentIntervalType} timer at ${getCurrentDatetime()}`])
     }
 
     const pauseTimer = () => {
         setIsActive(false)
-        setLogs([...logs, `Paused a ${currentIntervalType} timer at ${getCurrentDatetime()}`])
     }
 
     const resetTimer = () => {
         setIsActive(false)
-        setTime(durations.POMODORO)
-        setCurrentIntervalType(INTERVAL_TYPES.POMODORO)
-        setLogs([...logs, `Reset at ${getCurrentDatetime()}`])
+        setTime(timerDuration)
     }
+
+    return [time, setTime, isActive, startTimer, pauseTimer, resetTimer]
+}
+
+function PomodoroTimer(props) {
+    const [continuousMode, setContinuousMode] = useState(true)
+    const [time, setTime, isActive, startTimer, pauseTimer, resetTimer] = useTimer(DEFAULT_DURATIONS.POMODORO, continuousMode)
+
+    const [durations, setDurations] = useState(DEFAULT_DURATIONS)
+    const [currentBreakInterval, setCurrentBreakInterval] = useState(0)
+    const [currentIntervalType, setCurrentIntervalType] = useState(INTERVAL_TYPES.POMODORO)
+
+    const [logs, setLogs] = useState([])
 
     const preparePomodoro = () => {
         if (isActive) {
-        setLogs([...logs, `Stopped ${currentIntervalType} timer at ${getCurrentDatetime()}`])
+            setLogs([...logs, `Stopped ${currentIntervalType} timer at ${getCurrentDatetime()}`])
         }
-        setIsActive(false)
         setTime(durations.POMODORO)
         setCurrentIntervalType(INTERVAL_TYPES.POMODORO)
+        resetTimer();
     }
 
     const prepareShortBreak = () => {
         if (isActive) {
             setLogs([...logs, `Stopped ${currentIntervalType} timer at ${getCurrentDatetime()}`])
         }
-        setIsActive(false)
         setTime(durations.SHORT_BREAK)
         setCurrentIntervalType(INTERVAL_TYPES.SHORT_BREAK)
         setCurrentBreakInterval(currentBreakInterval + 1)
+        resetTimer();
     }
 
     const prepareLongBreak = () => {
         if (isActive) {
             setLogs([...logs, `Stopped ${currentIntervalType} timer at ${getCurrentDatetime()}`])
         }
-        setIsActive(false)
         setTime(durations.LONG_BREAK)
         setCurrentIntervalType(INTERVAL_TYPES.LONG_BREAK)
         setCurrentBreakInterval(0)
+        resetTimer();
     }
 
     useEffect(() => {
