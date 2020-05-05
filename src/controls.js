@@ -1,15 +1,16 @@
 import React from 'react';
+import { INTERVAL_TYPES } from './constants';
 
 function TimerSelection(props) {
     return (
         <div className="btn-group btn-group-toggle" data-toggle="buttons">
-            <label className={"btn btn-outline-secondary " + (props.currentIntervalType === "pomodoro" ? "active" : "")} onClick={props.preparePomodoro}>
+            <label className={"btn btn-outline-secondary " + (props.currentIntervalType === INTERVAL_TYPES.POMODORO ? "active" : "")} onClick={props.preparePomodoro}>
                 <input type="radio" name="options" id="option1" autoComplete="off"/> Pomodoro
             </label>
-            <label className={"btn btn-outline-secondary " + (props.currentIntervalType === "short-break" ? "active" : "")} onClick={props.prepareShortBreak}>
+            <label className={"btn btn-outline-secondary " + (props.currentIntervalType === INTERVAL_TYPES.SHORT_BREAK ? "active" : "")} onClick={props.prepareShortBreak}>
                 <input type="radio" name="options" id="option2" autoComplete="off"/> Short break
             </label>
-            <label className={"btn btn-outline-secondary " + (props.currentIntervalType === "long-break" ? "active" : "")} onClick={props.prepareLongBreak}>
+            <label className={"btn btn-outline-secondary " + (props.currentIntervalType === INTERVAL_TYPES.LONG_BREAK ? "active" : "")} onClick={props.prepareLongBreak}>
                 <input type="radio" name="options" id="option3" autoComplete="off" /> Long break
             </label>
         </div>
